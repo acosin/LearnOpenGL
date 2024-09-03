@@ -15,6 +15,8 @@
 #include <learnopengl/filesystem.h>
 #include <learnopengl/shader.h>
 
+#include "font_render.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void RenderText(Shader &shader, std::string text, float x, float y, float scale, glm::vec3 color);
@@ -23,13 +25,6 @@ void RenderText(Shader &shader, std::string text, float x, float y, float scale,
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-/// Holds all state information relevant to a character as loaded using FreeType
-struct Character {
-    unsigned int TextureID; // ID handle of the glyph texture
-    glm::ivec2   Size;      // Size of glyph
-    glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
-    unsigned int Advance;   // Horizontal offset to advance to next glyph
-};
 
 std::map<GLchar, Character> Characters;
 unsigned int VAO, VBO;
@@ -91,7 +86,7 @@ int main()
     }
 
 	// find path to font
-    std::string font_name = FileSystem::getPath("resources/fonts/Antonio-Bold.ttf");
+    std::string font_name = FileSystem::getPath("resources/fonts/QimiaoType-Regular.ttf");
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
@@ -168,8 +163,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+TextRender font_render(font_name, 48, shader.ID);
     // render loop
     // -----------
+    // std::string text = "当你在图形计算领域冒险到了一定阶段以后你可能会想使用OpenGL来绘制文本。然而，可能与你想象的并不一样，使用像OpenGL这样的底层库来把文本渲染到屏幕上并不是一件简单的事情。";
+    //text = "GPT-4 is OpenAI’s most advanced system, producing safer and more useful responses";
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -181,9 +179,16 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-        RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
-       
+        // RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+        // RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+
+        // font_render.RenderText(text, 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), 800.0f, 600.0f, true, true, 400);
+        
+        std::wstring utf8Text = L"s\nystem.你好，世界！这是一段包含中文的文本。";
+        //utf8Text = L"GPT-4 is OpenAI’s most advanced system, producing safer and more useful responses";
+        // utf8Text = L"GPT-4";
+        font_render.RenderText(utf8Text, 00.0f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), 800.0f, 600.0f, true, true, 400.0f);
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
