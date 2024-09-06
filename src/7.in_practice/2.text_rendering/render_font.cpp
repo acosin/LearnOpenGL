@@ -301,7 +301,8 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 GLfloat ypos = 0;
                 if(font_property_.new_font_render)
                 {
-                    ypos = (y + font_property_.font_size * scale - (line.ascend - ch.Bearing.y) * scale) / viewport_h_;
+                    // ypos = (y + font_property_.font_size * scale - (line.ascend - ch.Bearing.y) * scale) / viewport_h_;
+                    ypos = (y + font_property_.font_size * scale - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
                     TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
                     << " font_property_.font_size:" << font_property_.font_size
                     << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale)
