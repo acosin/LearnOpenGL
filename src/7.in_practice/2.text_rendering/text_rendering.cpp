@@ -191,7 +191,7 @@ int main(int argc, char* argv[], char* envp[])
     const auto font_type = "";
     const auto shadow = true;
     const auto new_font_render = true;
-    const auto debug = false;
+    const auto debug = true;
     auto color = glm::vec4(1, 1, 1, 1);
     // std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
     // std::wstring wide_str = conv.from_bytes(image);

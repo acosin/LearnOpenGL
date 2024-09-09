@@ -80,6 +80,7 @@ int ShaderUtil::CompileShader(const std::string &vertex_shader_src, const std::s
 
 int ShaderUtil::CompileShader(const std::string &shader_src, GLuint shader_id)
 {
+    TN_LOG(TN_LOG_INFO) << "compile shader:" << shader_src << std::endl;
     char const * shader_ptr = shader_src.c_str();
     GLint length = shader_src.size();
    CheckGLError(glShaderSource(shader_id, 1, &shader_ptr , &length));

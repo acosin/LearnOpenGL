@@ -393,19 +393,19 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 RenderText(to_be_render_content, x_+4, y_+4, 1, glm::vec4(0.0, 0.0, 0.0, 0.26), content_changed);
             }
             // main font
-            RenderText(to_be_render_content, x_, y_, 1, font_property_.text_color, content_changed);
+            // RenderText(to_be_render_content, x_, y_, 1, font_property_.text_color, content_changed);
         } 
 
         if(font_property_.debug)
         {
-            RenderRectangle(x_/viewport_w_ - 1.0, y_/viewport_h_ - 1.0, font_property_.show_width/viewport_w_, font_property_.show_height/viewport_h_);
+            RenderRectangle(x_, y_, font_property_.show_width, font_property_.show_height);
 
 
             for(int i=0; i<20; i++)
             {
                 for(int j=0; j<20; j++)
                 {
-                    RenderRectangle(i * 0.1 - 1, j*0.1-1, 2.0, 2.0);
+                    // RenderRectangle(i * 100, j*100, font_property_.show_width, font_property_.show_height);
                 }
             }
         }
