@@ -182,8 +182,8 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
        CheckGLError(glUseProgram(shader_program_));
        CheckGLError(glUniform4f(glGetUniformLocation(shader_program_, "textColor"), color.r, color.g, color.b, color.a));
          
-        TN_LOG(TN_LOG_ERROR) << "==================BEGIN RenderText=======================";
-        TN_LOG(TN_LOG_ERROR) << "text.size:" << text.size() << "tex_x:" << text_x << ", text_y:" << text_y << " scale:" << scale;
+        TN_LOG(TN_LOG_ERROR) << "==================BEGIN RenderText======================="<< std::endl;
+        TN_LOG(TN_LOG_ERROR) << "text.size:" << text.size() << "tex_x:" << text_x << ", text_y:" << text_y << " scale:" << scale << std::endl;
         GLfloat textHeight = 0;
         GLfloat x = text_x;
         GLfloat y = text_y;
@@ -252,7 +252,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             // y = text_y + (font_property_.show_height - textHeight) / 2.0f;
         }
 
-        TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " textHeight:" << textHeight ;
+        TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " textHeight:" << textHeight << std::endl;
         font_property_.Print();
 
         float begin_x = x;
@@ -283,7 +283,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 }
             }
             
-            TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y ;
+            TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y<< std::endl;
             for(int line_index=line.begin_index; line_index <= line.end_index; line_index++)
             {
                 auto tc = text[line_index];
@@ -306,7 +306,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                     TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
                     << " font_property_.font_size:" << font_property_.font_size
                     << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale)
-                    ;
+                    << std::endl;
                 }
                 else
                 {
@@ -393,7 +393,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 RenderText(to_be_render_content, x_+4, y_+4, 1, glm::vec4(0.0, 0.0, 0.0, 0.26), content_changed);
             }
             // main font
-            // RenderText(to_be_render_content, x_, y_, 1, font_property_.text_color, content_changed);
+            RenderText(to_be_render_content, x_, y_, 1, font_property_.text_color, content_changed);
         } 
 
         if(font_property_.debug)
@@ -450,8 +450,15 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
 
 
 void RenderFont::RenderRectangle(float left, float top, float width, float height) {
-    TN_LOG(TN_LOG_ERROR) << "==========================BEGIN render text rect==========================";
+    TN_LOG(TN_LOG_ERROR) << "==========================BEGIN render text rect=========================="<< std::endl;
     TN_LOG(TN_LOG_ERROR) << "left:" <<left << ", top:" << top << " width:" << width << " height:" << height << std::endl;
+
+    left = 2 * left / viewport_w_ - 1;
+    top = viewport_h_ - top;
+    top = 2 * top / viewport_h_ - 1;
+    width = width / viewport_w_;
+    height = height / viewport_h_;
+
     float bottomLeftX = left;
     float bottomLeftY = top - height;
     float topRightX = left + width;
@@ -469,18 +476,25 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
     };
 
     // 顶点索引，用于绘制两个三角形构成矩形
-    unsigned int indices[] = {
-        0, 1, 2,  // 第一个三角形
-        0, 2, 3   // 第二个三角形
+    // unsigned int indices[] = {
+    //     0, 1, 2,  // 第一个三角形
+    //     0, 2, 3   // 第二个三角形
+    // };
+      unsigned int indices[] = {
+        0, 1, 
+        1, 2,  
+        2, 3,
+        3, 0
     };
 
     // 创建 VAO 和 VBO
-     static GLuint VAO = 0, VBO = 0, EBO = 0;
-    if(VBO ==0)
-    {
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-    }
+    GLuint VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    // 绑定 VAO
+    glBindVertexArray(VAO);
 
     // 绑定并设置 VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -490,41 +504,40 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    // 位置属性
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // 颜色属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // 创建并使用着色器程序
     std::string shader_path = ConfigManager::Instance()->ShaderPath();
     unsigned int line_shader_program;
     if(tn::stitching::ShaderUtil::LoadShader(shader_path + "line.vert", shader_path + "line.frag", line_shader_program) != 0)
     {
-        TN_LOG(TN_LOG_ERROR) << "shader_path:" << shader_path << ", " << shader_path + "line.vert" << ", " << shader_path + "line.frag";
-        TN_LOG(TN_LOG_ERROR) << "==========================RETURN render text rect==========================";
+        TN_LOG(TN_LOG_ERROR) << "shader_path:" << shader_path << ", " << shader_path + "line.vert" << ", " << shader_path + "line.frag"<< std::endl;
+        TN_LOG(TN_LOG_ERROR) << "==========================RETURN render text rect=========================="<< std::endl;
         return;
     }
+    glUseProgram(line_shader_program);
 
-    // 获取着色器中属性的位置
-    GLint posAttrib = glGetAttribLocation(line_shader_program, "aPos");
-    GLint colorAttrib = glGetAttribLocation(line_shader_program, "aColor");
-
-    // 启用位置属性
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(posAttrib);
-
-    // 启用颜色属性
-    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
-    glEnableVertexAttribArray(colorAttrib);
 
     // 绘制矩形
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
 
-    // 清除绑定的缓冲
-    glDisableVertexAttribArray(posAttrib);
-    glDisableVertexAttribArray(colorAttrib);
+    // 解绑 VAO 和 VBO
+    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // 删除对象
-    // glDeleteBuffers(1, &VBO);
-    // glDeleteBuffers(1, &EBO);
-    TN_LOG(TN_LOG_ERROR) << "==========================END render text rect==========================";
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    TN_LOG(TN_LOG_ERROR) << "==========================END render text rect=========================="<< std::endl;
 }
 }
 }

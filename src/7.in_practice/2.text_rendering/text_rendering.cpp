@@ -74,7 +74,7 @@ using namespace tn::stitching;
 
 int main(int argc, char* argv[], char* envp[])
 {
-#if 0
+#if 1
     // create a parser
     cmdline::parser a;
 
@@ -84,8 +84,18 @@ int main(int argc, char* argv[], char* envp[])
     // 3rd argument is description
     // 4th argument is mandatory (optional. default is false)
     // 5th argument is default value  (optional. it used when mandatory is false)
-    a.add<std::string>("simulate-data-path", 'd', "camera frame and location data path", true, "");
-    a.add<std::string>("resource-path", '\0', "resource path", true, "");
+    a.add<int>("left", 'l', "left", false, 0);
+    a.add<int>("top", '\0', "top", false, 0);
+     a.add<int>("show-width", '\0', "show-width", false, 100);
+    a.add<int>("show-height", '\0', "show-height", false, 100);
+    a.add<int>("line-width", '\0', "line-width", false, 100);
+    a.add<int>("line-space", '\0', "line-space", false, 5);
+    a.add<bool>("horizontal_center", '\0', "horizontal_center", false, false);
+    a.add<bool>("vertical_center", '\0', "vertical_center", false, false);
+    a.add<bool>("shadow", '\0', "shadow", false, false);
+    a.add<int>("font-size", '\0', "font-size", false, 48);
+    a.add<int>("max-font-num", '\0', "max-font-num", false, 0);
+    
     // a.add<int>("from", '\0', "from frame index", false, 0);
 
     // a.add<int>("to", '\0', "to frame index", false, 100);
@@ -96,28 +106,28 @@ int main(int argc, char* argv[], char* envp[])
  
     // a.add<bool>("read-from-folder", '\0', "read from folder", false, false);
 
-    a.add<bool>("small-screen", 's', "change screen mode:small or big", false, false);
+    // a.add<bool>("small-screen", 's', "change screen mode:small or big", false, false);
 
-    a.add<float>("factor", '\0', "window size factor", false, 1.0);
+    // a.add<float>("factor", '\0', "window size factor", false, 1.0);
 
-    a.add<std::string>("config-path", 'c', "config  path", true, "");
-    a.add<std::string>("config-file", '\0', "config  file(.json)", false, "");
-    a.add<int>("msaa", '\0', "multisample AA", false, 1);
+    // a.add<std::string>("config-path", 'c', "config  path", true, "");
+    // a.add<std::string>("config-file", '\0', "config  file(.json)", false, "");
+    // a.add<int>("msaa", '\0', "multisample AA", false, 1);
 
-    a.add<std::string>("platform", 'p', "select platform:android, linux-ubuntu-1804, linux-ubuntu-faw-c801, linux-ubuntu-saic, windows-faw-801, windows-saic", true, "linux-ubuntu-faw-c801");
-    a.add<std::string>("mode", 'm', "select mode:avm, apa", false, "avm");
+    // a.add<std::string>("platform", 'p', "select platform:android, linux-ubuntu-1804, linux-ubuntu-faw-c801, linux-ubuntu-saic, windows-faw-801, windows-saic", true, "linux-ubuntu-faw-c801");
+    // a.add<std::string>("mode", 'm', "select mode:avm, apa", false, "avm");
 
-    //simuate data:
-    a.add<int>("from", '\0', "replay avm begin index", false, 0);
-    a.add<int>("to", '\0', "replay avm end index", false, 100);
-    // a.add<bool>("loop", '\0', "is loop replay avm images", false, false);
-    a.add<int>("frame-rate", '\0', "replay frame rate", false, 20);
+    // //simuate data:
+    // a.add<int>("from", '\0', "replay avm begin index", false, 0);
+    // a.add<int>("to", '\0', "replay avm end index", false, 100);
+    // // a.add<bool>("loop", '\0', "is loop replay avm images", false, false);
+    // a.add<int>("frame-rate", '\0', "replay frame rate", false, 20);
 
     
 
     a.parse_check(argc, argv);
 
-    std::string plat = a.get<std::string>("platform");
+    // std::string plat = a.get<std::string>("platform");
 
 #endif
     // glfw: initialize and configure
@@ -177,19 +187,19 @@ int main(int argc, char* argv[], char* envp[])
 
 
     const auto image = "";
-    const auto max_font_num = 20;
-    const auto show_width = 400;                     
-    const auto show_height = 200;
-    const auto font_size = 48;
+    const auto max_font_num = a.get<int>("max-font-num");
+    const auto show_width = a.get<int>("show-width");                     
+    const auto show_height = a.get<int>("show-height");
+    const auto font_size = a.get<int>("font-size");//48
     const auto height = 64;
-    const auto horizontal_center = true;                     
-    const auto vertical_center = true;
+    const auto horizontal_center = a.get<bool>("horizontal_center");                   
+    const auto vertical_center = a.get<bool>("vertical_center");  
     
-    auto line_width = 800;                     
-    auto line_space = 0;
+    auto line_width = a.get<int>("line-width");                   
+    auto line_space = a.get<int>("line-space");
     const auto font_weight = 64;
     const auto font_type = "";
-    const auto shadow = true;
+    const auto shadow = a.get<bool>("shadow");  
     const auto new_font_render = true;
     const auto debug = true;
     auto color = glm::vec4(1, 1, 1, 1);
@@ -206,8 +216,8 @@ int main(int argc, char* argv[], char* envp[])
             debug
             );
     std::wstring wide_str = L"当你在图形计算领域冒险到了一定阶段以后你可能会想使用OpenGL来绘制文本。";
-    float left = 100;
-    float top = 100;
+    float left = a.get<int>("left");
+    float top = a.get<int>("top");
     RenderFont render_font(wide_str, left, top, font_property);
     render_font.Init();
     render_font.Show();

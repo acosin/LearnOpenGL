@@ -17,7 +17,7 @@ namespace stitching
 
 int ShaderUtil::LoadShader(const std::string &vertex_shader_file, const std::string &fragment_shader_file, GLuint &shader_program)
 {
-    TN_LOG(TN_LOG_INFO) << "Compiling shader : " << vertex_shader_file << ", " << fragment_shader_file;
+    // TN_LOG(TN_LOG_INFO) << "Compiling shader : " << vertex_shader_file << ", " << fragment_shader_file;
     // std::cout  << "Compiling shader : " << vertex_shader_file << ", " << fragment_shader_file << std::endl;
     std::string v_src;
     std::string f_src;
@@ -80,7 +80,7 @@ int ShaderUtil::CompileShader(const std::string &vertex_shader_src, const std::s
 
 int ShaderUtil::CompileShader(const std::string &shader_src, GLuint shader_id)
 {
-    TN_LOG(TN_LOG_INFO) << "compile shader:" << shader_src << std::endl;
+    // TN_LOG(TN_LOG_INFO) << "compile shader:" << shader_src << std::endl;
     char const * shader_ptr = shader_src.c_str();
     GLint length = shader_src.size();
    CheckGLError(glShaderSource(shader_id, 1, &shader_ptr , &length));
