@@ -90,8 +90,8 @@ int main(int argc, char* argv[], char* envp[])
     a.add<int>("show-height", '\0', "show-height", false, 100);
     a.add<int>("line-width", '\0', "line-width", false, 100);
     a.add<int>("line-space", '\0', "line-space", false, 5);
-    a.add<bool>("horizontal_center", '\0', "horizontal_center", false, false);
-    a.add<bool>("vertical_center", '\0', "vertical_center", false, false);
+    a.add<bool>("horizontal-center", '\0', "horizontal-center", false, false);
+    a.add<bool>("vertical-center", '\0', "vertical-center", false, false);
     a.add<bool>("shadow", '\0', "shadow", false, false);
     a.add<int>("font-size", '\0', "font-size", false, 48);
     a.add<int>("max-font-num", '\0', "max-font-num", false, 0);
@@ -192,8 +192,8 @@ int main(int argc, char* argv[], char* envp[])
     const auto show_height = a.get<int>("show-height");
     const auto font_size = a.get<int>("font-size");//48
     const auto height = 64;
-    const auto horizontal_center = a.get<bool>("horizontal_center");                   
-    const auto vertical_center = a.get<bool>("vertical_center");  
+    const auto horizontal_center = a.get<bool>("horizontal-center");                   
+    const auto vertical_center = a.get<bool>("vertical-center");  
     
     auto line_width = a.get<int>("line-width");                   
     auto line_space = a.get<int>("line-space");

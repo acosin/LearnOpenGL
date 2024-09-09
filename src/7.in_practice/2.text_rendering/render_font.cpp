@@ -116,7 +116,6 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         characters_.clear();        
 
         text_index_ = 0;
- 
         for (auto c : text)
         {
             if (text_index_ >= font_property_.max_font_num)
@@ -271,19 +270,19 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             {
                 x = begin_x;
             }
-            if (font_property_.vertical_center)
-            {
-                if(font_property_.new_font_render)
-                {
-                    y -= (font_property_.font_size  - 0) / 2.0;
-                }
-                else
-                {
-                    y += (font_property_.font_size  - 0) / 2.0;
-                }
-            }
+            // if (font_property_.vertical_center)
+            // {
+            //     if(font_property_.new_font_render)
+            //     {
+            //         y -= (font_property_.font_size  - 0) / 2.0;
+            //     }
+            //     else
+            //     {
+            //         y += (font_property_.font_size  - 0) / 2.0;
+            //     }
+            // }
             
-            TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y<< std::endl;
+            TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " line.width:" << line.width << " font_property_.max_line_width:" << font_property_.max_line_width<< std::endl;
             for(int line_index=line.begin_index; line_index <= line.end_index; line_index++)
             {
                 auto tc = text[line_index];
@@ -456,8 +455,8 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
     left = 2 * left / viewport_w_ - 1;
     top = viewport_h_ - top;
     top = 2 * top / viewport_h_ - 1;
-    width = width / viewport_w_;
-    height = height / viewport_h_;
+    width = 2 * width / viewport_w_;
+    height = 2 * height / viewport_h_;
 
     float bottomLeftX = left;
     float bottomLeftY = top - height;
@@ -472,7 +471,11 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
         bottomLeftX, bottomLeftY, 1.0f, 0.0f, 0.0f,  // 左下角，红色
         bottomRightX, bottomRightY, 0.0f, 1.0f, 0.0f, // 右下角，绿色
         topRightX, topRightY, 0.0f, 0.0f, 1.0f,  // 右上角，蓝色
-        left, top, 1.0f, 1.0f, 0.0f   // 左上角，黄色
+        left, top, 1.0f, 1.0f, 0.0f,   // 左上角，黄色
+        (bottomLeftX + bottomRightX)/2.0, bottomRightY, 1.0, 1.0, 1.0,//下中心
+        (bottomLeftX + bottomRightX)/2.0, top, 1.0, 1.0, 1.0,//上中心
+        left, (top + bottomRightY)/2.0, 1.0, 1.0, 0.0,//左中心
+        topRightX, (top + bottomRightY)/2.0, 1.0, 1.0, 0.0,//左中心
     };
 
     // 顶点索引，用于绘制两个三角形构成矩形
@@ -484,7 +487,9 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
         0, 1, 
         1, 2,  
         2, 3,
-        3, 0
+        3, 0,
+        4, 5,
+        6, 7
     };
 
     // 创建 VAO 和 VBO
@@ -526,7 +531,7 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
 
     // 绘制矩形
     glBindVertexArray(VAO);
-    glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
     // 解绑 VAO 和 VBO
     glBindVertexArray(0);
