@@ -273,16 +273,9 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             y += (font_property_.show_height - textHeight) / 2.0f + max_bearingY;
             // y = text_y + (font_property_.show_height - 0) / 2.0f;
         }
-        if(font_property_.new_font_render)
+        else if(font_property_.new_font_render)
         {
-            // if (font_property_.vertical_center)
-            // {
-            //     y += font_property_.font_size / 1.0f;
-            // }
-            // else
-            // {
-            //     y += font_property_.font_size;
-            // }
+            y += font_property_.font_size;
         }
 
         TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " textHeight:" << textHeight << std::endl;
