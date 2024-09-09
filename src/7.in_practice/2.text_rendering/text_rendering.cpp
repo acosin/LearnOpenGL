@@ -95,6 +95,8 @@ int main(int argc, char* argv[], char* envp[])
     a.add<bool>("shadow", '\0', "shadow", false, false);
     a.add<int>("font-size", '\0', "font-size", false, 48);
     a.add<int>("max-font-num", '\0', "max-font-num", false, 0);
+    a.add<bool>("new-font-render", '\0', "new font render", false, false);
+    // a.add<std::wstring>("content", '\0', "content", false, L"");
     
     // a.add<int>("from", '\0', "from frame index", false, 0);
 
@@ -200,7 +202,7 @@ int main(int argc, char* argv[], char* envp[])
     const auto font_weight = 64;
     const auto font_type = "";
     const auto shadow = a.get<bool>("shadow");  
-    const auto new_font_render = true;
+    const auto new_font_render = a.get<bool>("new-font-render");
     const auto debug = true;
     auto color = glm::vec4(1, 1, 1, 1);
     // std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
@@ -216,6 +218,10 @@ int main(int argc, char* argv[], char* envp[])
             debug
             );
     std::wstring wide_str = L"当你在图形计算领域冒险到了一定阶段以后你可能会想使用OpenGL来绘制文本。";
+    // wide_str = L"GPT-4 is OpenAI’s most advanced system, producing safer and more useful responses";
+    // wide_str = L"GPT-4 is OpenAI’s";
+    wide_str = L"距离过近fghijkl";
+    // wide_str = L"258cm";
     float left = a.get<int>("left");
     float top = a.get<int>("top");
     RenderFont render_font(wide_str, left, top, font_property);

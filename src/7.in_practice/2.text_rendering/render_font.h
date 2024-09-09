@@ -48,6 +48,7 @@ namespace stitching
             ascend = 0;
             descend = 0;
         }
+        void Print();
     };
 
     struct FontProperty

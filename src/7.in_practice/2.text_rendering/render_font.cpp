@@ -23,13 +23,20 @@ namespace tn
 namespace stitching
 {
 
+void LineInfo::Print()
+{
+    TN_LOG(TN_LOG_ERROR) << "begin_index:" << begin_index << ", end_index:" << end_index << ", width:" << width 
+        << " height:" << height << ", ascend:" << ascend << ", descend:" << descend
+        << std::endl;
+}
+
 void FontProperty::Print()
 {
     TN_LOG(TN_LOG_ERROR) << "show_width:" << show_width << ", show_height:" << show_height << ", font_size:" << font_size 
         << " max_font_num:" << max_font_num << ", max_line_width:" << max_line_width << ", line_space:" << line_space
         << " font:" << font << ", shadow:" << shadow << " font_weight:" << font_weight << " horizontal_center:" << horizontal_center
         << " vertical_center:" << vertical_center << " new_font_render:" << new_font_render << " debug:" << debug
-        ;
+        << std::endl;
 }
     RenderFont::RenderFont(const std::wstring &content, const float &x, const float &y, const FontProperty &font_property)
         : init_done_(false), shader_program_(0), ft_(nullptr), face_(nullptr), is_active_(false), 
@@ -186,6 +193,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         GLfloat textHeight = 0;
         GLfloat x = text_x;
         GLfloat y = text_y;
+        
         lines.clear();
         LineInfo line;
         line.begin_index = 0;
@@ -229,26 +237,33 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 line.Reset();
             }
         }
+        float max_descend = 0;
         for(auto &line : lines)
         {
             textHeight += line.height;
+            max_descend = glm::max(max_descend, line.descend);
         }
-
+        y -= max_descend;
+        float offset_y = 0;
         // Calculate the center position
         if (font_property_.horizontal_center) {
             x = text_x + (font_property_.show_width - font_property_.max_line_width) / 2.0f;
         }
+
         if (font_property_.vertical_center) {
-            y = text_y + (font_property_.show_height - textHeight) / 2.0f;
-            // if(font_property_.new_font_render)
-            // {
-            //     y -= font_property_.font_size / 2.0f; 
-            // }
-            // else
-            // {
-            //     y += font_property_.font_size / 2.0f; 
-            // }
-            // y = text_y + (font_property_.show_height - textHeight) / 2.0f;
+            y += (font_property_.show_height - textHeight) / 2.0f;
+            // y = text_y + (font_property_.show_height - 0) / 2.0f;
+        }
+        if(font_property_.new_font_render)
+        {
+            if (font_property_.vertical_center)
+            {
+                y += font_property_.font_size / 1.0f;
+            }
+            else
+            {
+                y += font_property_.font_size;
+            }
         }
 
         TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " textHeight:" << textHeight << std::endl;
@@ -262,6 +277,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
 
         for(auto &line : lines)
         {
+            line.Print();
             if (font_property_.horizontal_center)
             {
                 x = begin_x + (font_property_.max_line_width - line.width) * 0.5f;
@@ -270,18 +286,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             {
                 x = begin_x;
             }
-            // if (font_property_.vertical_center)
-            // {
-            //     if(font_property_.new_font_render)
-            //     {
-            //         y -= (font_property_.font_size  - 0) / 2.0;
-            //     }
-            //     else
-            //     {
-            //         y += (font_property_.font_size  - 0) / 2.0;
-            //     }
-            // }
-            
+
             TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " line.width:" << line.width << " font_property_.max_line_width:" << font_property_.max_line_width<< std::endl;
             for(int line_index=line.begin_index; line_index <= line.end_index; line_index++)
             {
@@ -298,19 +303,14 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 
                 GLfloat xpos = (x + ch.Bearing.x * scale) / viewport_w_;
                 GLfloat ypos = 0;
-                if(font_property_.new_font_render)
-                {
-                    // ypos = (y + font_property_.font_size * scale - (line.ascend - ch.Bearing.y) * scale) / viewport_h_;
-                    ypos = (y + font_property_.font_size * scale - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
-                    TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
-                    << " font_property_.font_size:" << font_property_.font_size
-                    << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale)
-                    << std::endl;
-                }
-                else
-                {
-                    ypos = (y - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
-                }
+
+                ypos = (y - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
+                
+                // ypos = (y - (ch.Size.y - ch.Bearing.y) * scale)/ viewport_h_;
+                TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " char width:" << (ch.Advance >> 6) * scale << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
+                << " font_property_.font_size:" << font_property_.font_size
+                << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale)
+                << std::endl;
 
                 GLint loc =CheckGLError(glGetUniformLocation(shader_program_,"uImageBegin"));
                 CheckGLError(glUniform2f(loc, xpos, ypos));
@@ -400,13 +400,13 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             RenderRectangle(x_, y_, font_property_.show_width, font_property_.show_height);
 
 
-            for(int i=0; i<20; i++)
-            {
-                for(int j=0; j<20; j++)
-                {
-                    // RenderRectangle(i * 100, j*100, font_property_.show_width, font_property_.show_height);
-                }
-            }
+            // for(int i=0; i<20; i++)
+            // {
+            //     for(int j=0; j<20; j++)
+            //     {
+            //         RenderRectangle(i * 100, j*24, font_property_.show_width, font_property_.show_height);
+            //     }
+            // }
         }
 
        CheckGLError(glDisable(GL_CULL_FACE));
@@ -449,8 +449,8 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
 
 
 void RenderFont::RenderRectangle(float left, float top, float width, float height) {
-    TN_LOG(TN_LOG_ERROR) << "==========================BEGIN render text rect=========================="<< std::endl;
-    TN_LOG(TN_LOG_ERROR) << "left:" <<left << ", top:" << top << " width:" << width << " height:" << height << std::endl;
+    // TN_LOG(TN_LOG_ERROR) << "==========================BEGIN render text rect=========================="<< std::endl;
+    // TN_LOG(TN_LOG_ERROR) << "left:" <<left << ", top:" << top << " width:" << width << " height:" << height << std::endl;
 
     left = 2 * left / viewport_w_ - 1;
     top = viewport_h_ - top;
@@ -542,7 +542,7 @@ void RenderFont::RenderRectangle(float left, float top, float width, float heigh
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    TN_LOG(TN_LOG_ERROR) << "==========================END render text rect=========================="<< std::endl;
+    // TN_LOG(TN_LOG_ERROR) << "==========================END render text rect=========================="<< std::endl;
 }
 }
 }
