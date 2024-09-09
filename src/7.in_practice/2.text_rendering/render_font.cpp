@@ -237,13 +237,21 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 line.Reset();
             }
         }
+        float max_height = 0;
         float max_descend = 0;
+        float max_ascend = 0;
         for(auto &line : lines)
         {
-            textHeight += line.height;
+            // textHeight += line.height;
             max_descend = glm::max(max_descend, line.descend);
+            max_ascend = glm::max(max_ascend, line.ascend);
+            max_height = glm::max(max_height, line.height);
+            line.Print();
         }
-        y -= max_descend;
+        textHeight = max_height * lines.size();
+        // TN_LOG(TN_LOG_ERROR) << "before x:" << x << ", y:" << y << " max_ascend:" << max_ascend << " max_descend:" << max_descend << std::endl;
+        // // y -= (max_ascend - max_descend) / 2.0f;
+        // TN_LOG(TN_LOG_ERROR) << "after x:" << x << ", y:" << y << " max_ascend:" << max_ascend << " max_descend:" << max_descend << std::endl;
         float offset_y = 0;
         // Calculate the center position
         if (font_property_.horizontal_center) {
@@ -256,14 +264,14 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         }
         if(font_property_.new_font_render)
         {
-            if (font_property_.vertical_center)
-            {
-                y += font_property_.font_size / 1.0f;
-            }
-            else
-            {
-                y += font_property_.font_size;
-            }
+            // if (font_property_.vertical_center)
+            // {
+            //     y += font_property_.font_size / 1.0f;
+            // }
+            // else
+            // {
+            //     y += font_property_.font_size;
+            // }
         }
 
         TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " textHeight:" << textHeight << std::endl;
@@ -304,12 +312,13 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
                 GLfloat xpos = (x + ch.Bearing.x * scale) / viewport_w_;
                 GLfloat ypos = 0;
 
+                float new_y = (y - (ch.Size.y + ch.Ymin) * scale);
                 ypos = (y - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
-                
+                ypos = (y - 0) / viewport_h_;
                 // ypos = (y - (ch.Size.y - ch.Bearing.y) * scale)/ viewport_h_;
                 TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " char width:" << (ch.Advance >> 6) * scale << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
-                << " font_property_.font_size:" << font_property_.font_size
-                << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale)
+                << " font_property_.font_size:" << font_property_.font_size << " new_y:" << new_y
+                << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale) << " max_height:" << max_height
                 << std::endl;
 
                 GLint loc =CheckGLError(glGetUniformLocation(shader_program_,"uImageBegin"));
@@ -342,7 +351,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             }
 
             x = begin_x;
-            y += font_property_.font_size + font_property_.line_space;
+            y += max_height + font_property_.line_space;
 
         }
     
@@ -400,13 +409,12 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             RenderRectangle(x_, y_, font_property_.show_width, font_property_.show_height);
 
 
-            // for(int i=0; i<20; i++)
-            // {
-            //     for(int j=0; j<20; j++)
-            //     {
-            //         RenderRectangle(i * 100, j*24, font_property_.show_width, font_property_.show_height);
-            //     }
-            // }
+
+            for(int j=0; j<100; j++)
+            {
+                // RenderRectangle(0, j*24, font_property_.show_width, font_property_.show_height);
+            }
+
         }
 
        CheckGLError(glDisable(GL_CULL_FACE));

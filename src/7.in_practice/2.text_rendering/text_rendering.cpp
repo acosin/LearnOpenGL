@@ -220,8 +220,8 @@ int main(int argc, char* argv[], char* envp[])
     std::wstring wide_str = L"当你在图形计算领域冒险到了一定阶段以后你可能会想使用OpenGL来绘制文本。";
     // wide_str = L"GPT-4 is OpenAI’s most advanced system, producing safer and more useful responses";
     // wide_str = L"GPT-4 is OpenAI’s";
-    wide_str = L"距离过近fghijkl";
-    // wide_str = L"258cm";
+    wide_str = L"距离过近";
+    // wide_str = L"258cmghjkHMpqr";
     float left = a.get<int>("left");
     float top = a.get<int>("top");
     RenderFont render_font(wide_str, left, top, font_property);
