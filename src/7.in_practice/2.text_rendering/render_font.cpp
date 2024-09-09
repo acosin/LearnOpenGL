@@ -23,6 +23,13 @@ namespace tn
 namespace stitching
 {
 
+void Character::Print()
+{
+    TN_LOG(TN_LOG_ERROR) << "TextureID:" << TextureID << ", Size.x:" << Size.x << ", Size.y:" << Size.y 
+        << " Bearing.x:" << Bearing.x << ", Bearing.y:" << Bearing.y << ", Advance:" << Advance << ", Ymin:" << Ymin
+        << std::endl;
+}
+
 void LineInfo::Print()
 {
     TN_LOG(TN_LOG_ERROR) << "begin_index:" << begin_index << ", end_index:" << end_index << ", width:" << width 
@@ -197,6 +204,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         lines.clear();
         LineInfo line;
         line.begin_index = 0;
+        int max_bearingY = 0;
         // Calculate the overall height of the text so that it is vertically centered
         for (int index=0; index<text.size(); index++)
         {
@@ -230,6 +238,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
             line.ascend = glm::max(line.ascend, ch.Bearing.y * scale);
             line.descend = glm::max(line.descend, (ch.Size.y - ch.Bearing.y) * scale);
             line.height = line.ascend + line.descend;
+            max_bearingY = glm::max(max_bearingY, ch.Bearing.y);
             if(index == text.size()-1)
             {
                 line.end_index = index;
@@ -240,12 +249,14 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         float max_height = 0;
         float max_descend = 0;
         float max_ascend = 0;
+        
         for(auto &line : lines)
         {
             // textHeight += line.height;
             max_descend = glm::max(max_descend, line.descend);
             max_ascend = glm::max(max_ascend, line.ascend);
             max_height = glm::max(max_height, line.height);
+            
             line.Print();
         }
         textHeight = max_height * lines.size();
@@ -259,7 +270,7 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
         }
 
         if (font_property_.vertical_center) {
-            y += (font_property_.show_height - textHeight) / 2.0f;
+            y += (font_property_.show_height - textHeight) / 2.0f + max_bearingY;
             // y = text_y + (font_property_.show_height - 0) / 2.0f;
         }
         if(font_property_.new_font_render)
@@ -314,12 +325,13 @@ void RenderFont::SetFontProperty(const FontProperty &font_peroperty) { font_prop
 
                 float new_y = (y - (ch.Size.y + ch.Ymin) * scale);
                 ypos = (y - (ch.Size.y + ch.Ymin) * scale) / viewport_h_;
-                ypos = (y - 0) / viewport_h_;
+                // ypos = (y - 0) / viewport_h_;
                 // ypos = (y - (ch.Size.y - ch.Bearing.y) * scale)/ viewport_h_;
                 TN_LOG(TN_LOG_ERROR) << "x:" << x << ", y:" << y << " char width:" << (ch.Advance >> 6) * scale << " ch.Size.y:" << ch.Size.y << " ch.Ymin:" << ch.Ymin 
                 << " font_property_.font_size:" << font_property_.font_size << " new_y:" << new_y
                 << "chary:" << (y + font_property_.font_size - (ch.Size.y + ch.Ymin) * scale) << " max_height:" << max_height
                 << std::endl;
+                ch.Print();
 
                 GLint loc =CheckGLError(glGetUniformLocation(shader_program_,"uImageBegin"));
                 CheckGLError(glUniform2f(loc, xpos, ypos));

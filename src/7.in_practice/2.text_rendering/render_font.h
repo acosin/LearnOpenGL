@@ -29,6 +29,7 @@ namespace stitching
         glm::ivec2 Bearing;     // Offset from baseline to left/top of glyph
         unsigned int Advance;   // Horizontal offset to advance to next glyph
         signed long Ymin;
+        void Print();
     };
 
     struct LineInfo
