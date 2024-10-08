@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 add_definitions(-Ddebug_font)
 add_definitions(-DENABLE_GL_CHECK)
+add_definitions(-Ddebug_camera_renderer)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
@@ -175,6 +176,7 @@ set(7.in_practice
     1.debugging
     2.text_rendering
     #3.2d_game
+    4.stitching
 )
 
 set(GUEST_ARTICLES
@@ -226,7 +228,7 @@ function(create_project_from_sources chapter demo)
 	endif()
     add_executable(${NAME} ${SOURCE})
     target_link_libraries(${NAME} ${LIBS})
-    target_link_libraries(${NAME} -lboost_system)
+    target_link_libraries(${NAME} -lboost_system -lIL -lILU -lILUT)
     
     if(MSVC)
 		target_compile_options(${NAME} PRIVATE /std:c++17 /MP)
