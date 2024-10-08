@@ -4,17 +4,18 @@
 #include "freetype/ftoutln.h"
 #include FT_FREETYPE_H
 
+#include "config_manager.h"
+#include "shader_util.h"
 
 #define GL_GLEXT_PROTOTYPES
 
 
-#ifndef debug_font
 
+#ifndef debug_font
+#pragma message(ndef debug_font)
 #include "GLES3/gl3.h"
 #include "GLES3/gl31.h"
 #include "tn_logger.h"
-#include "config_manager.h"
-#include "shader_util.h"
 
 #endif
 

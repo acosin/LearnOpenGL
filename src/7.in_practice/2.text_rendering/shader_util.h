@@ -12,8 +12,11 @@
 
 #ifndef debug_font
 #include <GLES2/gl2.h>
+#else
+#include <glad/glad.h>
 #endif
 
+#include <iostream>
 #include <string>
 
 
@@ -32,6 +35,18 @@ private:
     static int CompileShader(const std::string &shader_src, GLuint shader_id);
 };
 
+unsigned int CheckError(const char* file, int line);
+unsigned int InnerCheckGLError(const char* file, int line);
+
+#define CheckGLError(glFunc) \
+    glFunc;\
+    tn::stitching::InnerCheckGLError(__FILE__, __LINE__);
+// #if defined ENABLE_GL_CHECK
+
+
+#ifdef debug_font
+#define TN_LOG(X) std::cout
+#endif
 
 } // namespace stitching {
 } // namespace tn {

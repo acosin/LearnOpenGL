@@ -17,7 +17,12 @@
 
 #ifndef debug_font
 #include "GLES2/gl2.h"
+#else
+#include <glad/glad.h>
 #endif
+
+
+
 namespace tn
 {
 namespace stitching

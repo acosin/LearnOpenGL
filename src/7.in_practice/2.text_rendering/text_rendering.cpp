@@ -15,24 +15,24 @@
 #include <learnopengl/filesystem.h>
 #include <learnopengl/shader.h>
 
-#define debug_font
 
-#ifdef debug_font
-#define TN_LOG(X) std::cout
-#endif
+#include "config_manager.h"
+
+#pragma message(def debug_font)
+
+
+
+
 
 #include "cmdline.h"
 
-unsigned int CheckError(const char* file, int line);
-unsigned int InnerCheckGLError(const char* file, int line);
 
-#if defined ENABLE_GL_CHECK
-#define CheckGLError(glFunc) \
-    glFunc;\
-    tn::stitching::InnerCheckGLError(__FILE__, __LINE__);
-#else
-#define CheckGLError(glFunc) glFunc;
-#endif
+// #define CheckGLError(glFunc) \
+//     glFunc;\
+//     tn::stitching::InnerCheckGLError(__FILE__, __LINE__);
+// #else
+// #define CheckGLError(glFunc) glFunc;
+// #endif
 
 #include "shader_util.h"
 #include "render_font.h"
@@ -46,31 +46,10 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 
-namespace tn
-{
-namespace stitching
-{
 
-class ConfigManager
-{
-    static ConfigManager* instance_ ;
-public:
-static ConfigManager* Instance() {
-        if (nullptr == instance_)
-            instance_ = new ConfigManager();
-        return instance_;
-    }
-
-    std::string GetDefautFont() const{return "../../src/7.in_practice/2.text_rendering/QimiaoType-Regular.ttf";}
-    std::string ShaderPath() { return "../../src/7.in_practice/2.text_rendering/"; }
-    
-};
+using namespace tn::stitching;
 
 ConfigManager* ConfigManager::instance_ = nullptr;
-
-} // namespace stitching {
-} // namespace tn {
-using namespace tn::stitching;
 
 int main(int argc, char* argv[], char* envp[])
 {
@@ -271,58 +250,5 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-
-
-const char *opengl_error_string(GLenum flag)
-{
-    static char str[256] = {'\0'};
-
-    switch (flag)
-    {
-    case GL_NO_ERROR:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_NO_ERROR");
-        break;
-    case GL_INVALID_ENUM:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_INVALID_ENUM");
-        break;
-    case GL_INVALID_VALUE:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_INVALID_VALUE");
-        break;
-    case GL_INVALID_OPERATION:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_INVALID_OPERATION");
-        break;
-    case GL_INVALID_FRAMEBUFFER_OPERATION:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_INVALID_FRAMEBUFFER_OPERATION");
-        break;
-    case GL_OUT_OF_MEMORY:
-        snprintf(str, sizeof(str), "0x%04x:%s", flag, "GL_OUT_OF_MEMORY");
-        break;
-    default:
-        snprintf(str, sizeof(str), "unknown flag:0x%04x", flag);
-    }
-
-    return str;
-}
-
-
-unsigned int CheckError(const char* file, int line)
-{
-    GLenum error_code =glGetError();
-    if (error_code != GL_NO_ERROR)
-    {
-        TN_LOG(TN_LOG_ERROR) << "ERROR:" << file << ":" << line << " ==>" << opengl_error_string(error_code) <<  std::endl;
-    }
-    // else
-    //    TN_LOG(TN_LOG_ERROR) << "ERROR:" << file << ":" << line << " ==>" << ErrorDescription(error_code) <<  std::endl;
-    return error_code;
-}
-
-
-unsigned int InnerCheckGLError(const char* file, int line)
-{
-    return CheckError(file, line);
-}
-
-
-#include "render_font.cpp"
-#include "shader_util.cpp"
+// #include "render_font.cpp"
+// #include "shader_util.cpp"
