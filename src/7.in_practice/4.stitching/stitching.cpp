@@ -273,18 +273,13 @@ int main(int argc, char* argv[], char* envp[])
     }
     
     InitRendering();
+    camera_renderer_->Init();
     // OpenGL state
     // ------------
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    // compile and setup the shader
-    // ----------------------------
-    Shader shader("text.vs", "text.fs");
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
-    shader.use();
-    glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 
     // render loop

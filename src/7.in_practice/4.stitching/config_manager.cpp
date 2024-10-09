@@ -15,7 +15,7 @@ ConfigManager* ConfigManager::instance_ = nullptr;
 
 ConfigManager::ConfigManager():default_font_(""), avm_config_path_(""), layout_cfg_(""), origin_ppm_(0), custom_ppm_(0)
 {
-    resource_path_ = "./resource/stitching/";
+    resource_path_ = "/home/sin/learn/learnOpenGL/src/7.in_practice/4.stitching"; // "./resource/stitching/";
     lut_parent_path_ = resource_path_; 
     test_window_title_ = "Stitching"; 
     canvas_width_ = 512;
