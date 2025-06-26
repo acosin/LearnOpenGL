@@ -196,15 +196,25 @@ int main()
     // load textures
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/container.jpg").c_str());
-
+    int id = 3;
+    std::string folder = std::to_string(id);
     vector<std::string> faces
     {
+    #if 01
         FileSystem::getPath("resources/textures/skybox/right.jpg"),
         FileSystem::getPath("resources/textures/skybox/left.jpg"),
         FileSystem::getPath("resources/textures/skybox/top.jpg"),
         FileSystem::getPath("resources/textures/skybox/bottom.jpg"),
         FileSystem::getPath("resources/textures/skybox/front.jpg"),
         FileSystem::getPath("resources/textures/skybox/back.jpg")
+    #else
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/right.png"),
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/left.png"),
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/top.png"),
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/bottom.png"),
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/front.png"),
+        FileSystem::getPath("resources/textures/skybox/" + folder + "/back.png")
+    #endif
     };
     unsigned int cubemapTexture = loadCubemap(faces);
 
